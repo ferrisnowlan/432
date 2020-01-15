@@ -1,5 +1,5 @@
 #1: load data
-MData <- read.csv("~/Desktop/432 Github/biol432/measurements.csv")
+MData <- read.csv("~/Desktop/432 Github/measurements.csv")
 library(dplyr)
 
 #2: create Volume column
@@ -31,10 +31,10 @@ library(ggplot2)
 
 #I need to convert Limb.Width and Limb.Length to same units again...
 
-#initialize vector
+#initialize new vector
 Limb.Width.cm <- 1:10
 
-#add values
+#add unit corrected values
 for (i in 1:length(MData$unitsL)){
   if(MData$unitsL[i] == "mm"){
     Limb.Width.cm[i] <- ((MData$Limb.Width[i])/10) 
@@ -43,10 +43,10 @@ for (i in 1:length(MData$unitsL)){
   }
 }
 
-#initialize vector
+#initialize new vector
 Limb.Length.cm <- 1:10
 
-#add values
+#add unit corrected values
 for (i in 1:length(MData$unitsL)){
   if(MData$unitsL[i] == "mm"){ 
     Limb.Length.cm[i] <- ((MData$Limb.Length[i])/10)
