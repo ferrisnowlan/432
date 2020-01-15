@@ -57,7 +57,7 @@ for (i in 1:length(MData$unitsL)){
 
 #plot
 qplot(x=Limb.Width.cm, y= Limb.Length.cm, xlab= "Limb Width (cm)", 
-      ylab= "Limb Length (cm)", main= "Limb Dimension Comparison Across Species",
-      alpha = (I(0.5))) +
-  theme_classic()
+      ylab= "Limb Length (cm)",
+      alpha = I(0.4), size=I(5), colour= Species, data = MData) +
+    theme_classic()
   

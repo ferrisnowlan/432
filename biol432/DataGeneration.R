@@ -6,7 +6,7 @@ set.seed(1)
 Limb.Width <- rnorm(n=10, mean=10, sd=10)
 
 #6: remove negative values
-Limb.Width <- abs(Limb.Width)
+abs(Limb.Width)
 
 #7: create 10 random mm or cm values
 set.seed(2)
