@@ -60,4 +60,17 @@ qplot(x=Limb.Width.cm, y= Limb.Length.cm, xlab= "Limb Width (cm)",
       ylab= "Limb Length (cm)",
       alpha = I(0.4), size=I(5), colour= Species, data = MData) +
     theme_classic()
+
+x <- c(1:100)
+for (i in 1:length(x)){
+  if(x[i] < 10){
+    print("Number < 10")
+  } else{
+    print(x[i])
+  }
+}
+
+MyFunction <- function(x){
+  
+  return(log(x))}
   
