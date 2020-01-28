@@ -1,0 +1,150 @@
+---
+title: "DataAnalysis"
+author: "Ferris"
+date: "22/01/2020"
+output: html_document
+---
+
+```{r knit, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Set Up
+
+### Load Necessary Libraries
+
+```{r library}
+library(dplyr)
+library(ggplot2)
+library(knitr)
+```
+
+### Load Data
+
+The raw data is a set of species with their limb lengths and limb widths saved in either "cm" or "mm" units. We are going to load up that data and assign each column an abbreviated title, to make further code easier to write.
+
+SPE = Species
+
+LMW = Limb Width
+
+UNW = Limb Width Units
+
+LML = Limb Length
+
+UNL = Limb Length Units
+
+```{r data}
+setwd("..")
+MData <- read.csv(file= "measurements.csv" )
+names(MData) <- c("X", "SPE", "LMW", "UNW", "LML", "UNL")
+
+```
+
+### Correct Units
+
+To make further analysis easier, we are going to put all the limb measurements into centimetres. 
+
+```{r fix units, echo=T }
+
+
+for (i in 1:length(MData$UNW)){
+  if(MData$UNW[i] == "mm"){ 
+    MData$LMW[i] <- (MData$LMW[i])/10
+  } else{
+    MData$LMW[i] <- MData$LMW[i]
+  }}
+  
+for (i in 1:length(MData$UNL)){
+  if(MData$UNL[i] == "mm"){ 
+    MData$LML[i] <- (MData$LML[i])/10
+  } else{
+    MData$LML[i] <- MData$LML[i]
+  }}
+
+MData$UNL <- "cm"
+MData$UNW <- "cm"
+
+```
+
+### Get Volume
+
+With all our measurements converted to centimetres, calculating the volume of each limb is a simple task. 
+
+```{r Get Volume}
+MData$LMW <- as.numeric(MData$LMW)
+MData$LML <- as.numeric(MData$LML)
+MData <- as.data.frame(MData)
+
+MData <- mutate(MData, Volume = ((pi*((LMW)/2)^2)*LML))
+
+MData$Volume <- as.numeric(MData$Volume)
+```
+
+### Graph 1. Limb Dimensions for Each Species
+
+This graph depicts the relationship between limb length and limb width for all species in the dataset. As you can see, limb length and limb width are not correlated with each other. 
+
+```{r create graph}
+qplot(x=LMW, y= LML, xlab= "Limb Width (cm)", 
+      ylab= "Limb Length (cm)",
+      alpha = I(0.4), size=I(5), colour= SPE, data = MData) +
+    theme_classic()
+```
+
+### Graph 2. Limb Dimensions for Species with Above Average Limb Volume
+
+This graph depicts only the animals with above average volume. There are only two animals with above average volume; they were so much larger than the others that they significantly pulled up the average. 
+
+
+```{r filter}
+MData.BV <- subset(MData, MData$Volume >= mean(MData$Volume))
+```
+
+```{r newgraph, echo = T}
+qplot(x=LMW, y= LML, xlab= "Limb Width (cm)", 
+      ylab= "Limb Length (cm)",
+      alpha = I(0.4), size=I(5), colour= SPE, data = MData.BV) +
+  xlim(0,30) +
+  ylim(0,16) +
+  geom_text(aes(label= paste(round(Volume), "cm^3")), vjust = 1.7)
+```
+
+### Table 1. Species with below average volume
+
+Here are all the species with below average volume.
+
+Species | Volume | 
+--------|--------|
+lynx | 4.171790 |
+rhino beetle | 77.847065 |
+manta ray | 2.671130 |
+scarlet macaw | 16.600606 |
+moose  | 2.607722 |
+leprechaun | 50.233400 |
+angelfish | 426.818329 |
+black guillemot | 85.920365 |
+
+```{echo=F}
+```
+
+
+### Is a Species' Magnificence related to Limb Dimension?
+
+We want to determine if limb dimensions of a species are related to how magnificent it is. So we first need to assign magnificence, and then we will calculate some basic statistics to see if different levels of magnificence are correlated to limb dimensions.
+
+```{r table, echo = T}
+
+MData$Magnificence <- c("low", "low", "high", "high", "high", "low", "low", "low", "high", "high")
+
+MData.stats <- MData %>% 
+   group_by(Magnificence) %>% 
+    summarise(AvgLimbLength = mean(LML), SDL = sd(LML), AvgLimbWidth = mean(LMW), SDW = sd(LMW), AvgLimbVolume = mean(Volume), SDV = sd(Volume)) %>% 
+    arrange(desc(AvgLimbLength))
+
+kable(MData.stats, label = "Limb Dimensions For Species of Differing Magnificence Level")
+```
+
+
+### Conclusions
+
+In  Table 2, the standard deviation of the limb dimensions is equal to or greater than the average in all cases. This implies that there is no meaningful correlation between a species' magnificence and their limb dimensions, which makes sense because both variables were assigned to each species at random.
